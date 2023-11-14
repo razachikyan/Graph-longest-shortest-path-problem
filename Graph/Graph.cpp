@@ -1,30 +1,108 @@
 #include "./Graph.hpp"
 
-void Graph::inputGraphNodes() {
-    for(int i = 0; i < nodeCount; ++i) {
-        int node;
-        std::cout << std::endl << "Enter node: ";
-        std::cin >> node;
-        nodes.push_back(Node(node));
-    };
-}
-
-void Graph::inputGraphEdges() {
+void Graph::getGraphWeights() {
     for(int i = 0; i < edgeCount; ++i) {
+        std::string ans;
+        std::cout << std::endl << i << " Enter node1 node2 and weight in this format [node1] [node2] [weight]";
+        std::getline(std::cin, ans);
+        std::istringstream iss(ans);
+        std::string word;
+        int ind = 0;
         int weight;
-        int node1;
-        int node2;
-        std::cout << std::endl << "Enter node1: ";
-        std::cin >> node1;
-        std::cout << std::endl << "Enter node2: ";
-        std::cin >> node1;
-        std::cout << std::endl << "Enter weight: ";
-        std::cin >> weight;
-        edges.push_back(Edge(Node(node1), Node(node2), weight));
-    };
+        std::pair<int, int> neighborNodes = {0, 0};
+        while (iss >> word) {
+            switch(ind) {
+                case 0: {
+                    neighborNodes.first = std::stoi(word);
+                    break;
+                }
+                case 1: {
+                    neighborNodes.second = std::stoi(word);
+                    break;
+                }
+                case 2: {
+                    weight = std::stoi(word);
+                    break;
+                }
+                default: throw std::runtime_error("Too meny input values. Not valid!.");
+            }
+            ++ind;
+        }
+        graphWeights[neighborNodes] = weight;
+    }
+};
+
+void Graph::getNeighborMatrix() {
+    for(int i = 0; i < nodeCount; ++ i) {
+        for(int j = 0; j < nodeCount; ++ j) {
+            auto weight = graphWeights.find(std::make_pair(i, j));
+            neighborMatrix[i][j] = (weight != graphWeights.end()) ? weight->second : 0;
+        }
+    }
+};
+
+void Graph::printNeighborMatrix() {
+    std::cout << "[" << std::endl;
+    for(int i = 0; i < nodeCount; ++ i) {
+        std::cout << "\t";
+        for(int j = 0; j < nodeCount; ++ j) {
+            std::cout << neighborMatrix[i][j] << ", " ;
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "]" << std::endl;
 }
 
 void Graph::inputGraph() {
-    inputGraphNodes();
-    inputGraphEdges();
+    std::cout << "Enter the count of nodes and edges of graph :";
+    std::string ans;
+    std::getline(std::cin, ans);
+    std::istringstream iss(ans);
+    std::string word;
+    int ind = 0;
+    while (iss >> word) {
+        switch(ind) {
+            case 0: {
+                nodeCount = std::stoi(word);
+                break;
+            }
+            case 1: {
+                edgeCount = std::stoi(word);
+                break;
+            }
+            default: throw std::runtime_error("Too meny input values. Not valid!.");
+        }
+        ++ind;
+    }
+
+    std::cout << std::endl;
+    getGraphWeights();
+    std::cout << "javascript is the best laguage in the wold";
+
+    getNeighborMatrix();
+}
+
+void Graph::multiplyMatrices(const Matrix& A, const Matrix& B) {
+    int rows_A = A.size();
+    int cols_A = A[0].size();
+    int cols_B = B[0].size();
+
+    // Matrix result(rows_A, std::vector<int>(cols_B, 0));
+
+    for (int i = 0; i < rows_A; ++i) {
+        for (int j = 0; j < cols_B; ++j) {
+            for (int k = 0; k < cols_A; ++k) {
+                neighborMatrix[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+}
+
+void Graph::printMatrix() {
+    for (const auto& row : neighborMatrix) {
+        for (int element : row) {
+            std::cout << element << " ";
+        }
+        std::cout << std::endl;
+    }
 }

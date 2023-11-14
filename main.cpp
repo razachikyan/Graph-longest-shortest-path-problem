@@ -1,7 +1,8 @@
 #include "./Graph/Graph.hpp"
 
 int main() {
-    Graph graph(7, 7);
+    Graph graph;
     graph.inputGraph();
+    graph.printNeighborMatrix();
     return 0;
 }
