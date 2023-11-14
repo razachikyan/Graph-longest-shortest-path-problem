@@ -5,22 +5,30 @@
 #include <string>
 #include <sstream>
 #include <utility>
+#include <queue>
+#include <algorithm>
+#include <climits>
 
-using numArr = std::vector<int>;
-using Matrix = std::vector<numArr>;
+using NumArr = std::vector<int>;
+using Matrix = std::vector<NumArr>;
 using Weights = std::map<std::pair<int, int>, int>;
+struct Node {
+    int vertex;
+    int cost;
+    int heuristic;
 
+    bool operator>(const Node& other) const {
+        return cost + heuristic > other.cost + other.heuristic;
+    }
+};
 class Graph {
 public:
     Graph() {}
-    void printNeighborMatrix();
     void getNeighborMatrix();
     void getGraphWeights();
     void inputGraph();
     void printMatrix();
-    Matrix multiplyMatrices(const Matrix &matrix,const Matrix &matrix2);
-    Matrix getMatrixPow(int pow, const Matrix &matrix);
-    Matrix cloneMatrix(const Matrix &matrix1);
+    NumArr astar(const Matrix& graph, int start, int goal);
 private:
     Weights graphWeights;
     Matrix neighborMatrix;

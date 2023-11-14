@@ -41,18 +41,6 @@ void Graph::getNeighborMatrix() {
     }
 };
 
-void Graph::printNeighborMatrix() {
-    std::cout << "[" << std::endl;
-    for(int i = 0; i < nodeCount; ++ i) {
-        std::cout << "\t";
-        for(int j = 0; j < nodeCount; ++ j) {
-            std::cout << neighborMatrix[i][j] << ", " ;
-        }
-        std::cout << std::endl;
-    }
-    std::cout << "]" << std::endl;
-}
-
 void Graph::inputGraph() {
     std::cout << "Enter the count of nodes and edges of graph :";
     std::string ans;
@@ -82,43 +70,6 @@ void Graph::inputGraph() {
     getNeighborMatrix();
 }
 
-Matrix Graph::cloneMatrix(const Matrix &matrix) {
-    Matrix res;
-    for (const auto& row : matrix) {
-        res.push_back(row);
-        for (int element : row) {
-            res[res.size() -1].push_back(element);
-        }
-    }
-
-    return res;
-}
-
-Matrix Graph::getMatrixPow(int pow,const Matrix &matrix) {
-    Matrix res = cloneMatrix(neighborMatrix);
-    if(pow <= 2) {
-        return multiplyMatrices(res, neighborMatrix);
-    } else {
-        Matrix temp = multiplyMatrices(res, matrix);
-        return getMatrixPow(pow-1, temp);
-    }
-}
-
-Matrix Graph::multiplyMatrices(const Matrix &matrix1, const Matrix &matrix2) {
-    Matrix res = cloneMatrix(neighborMatrix);
-    int rows_A = matrix1.size();
-    int cols_A = matrix1[0].size();
-    int cols_B = matrix2[0].size();
-    for (int i = 0; i < rows_A; ++i) {
-        for (int j = 0; j < cols_B; ++j) {
-            for (int k = 0; k < cols_A; ++k) {
-                res[i][j] += res[i][k] * neighborMatrix[k][j];
-            }
-        }
-    }
-    return res;
-}
-
 void Graph::printMatrix() {
     for (const auto& row : neighborMatrix) {
         for (int element : row) {
@@ -126,4 +77,48 @@ void Graph::printMatrix() {
         }
         std::cout << std::endl;
     }
+}
+
+NumArr Graph::astar(const Matrix& graph, int start, int goal) {
+    int n = graph.size();
+    NumArr parent(n, -1);
+    NumArr cost(n, INT_MAX);
+    NumArr heuristic(n, 0);
+
+    std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq;
+
+    pq.push({start, 0, 0});
+    cost[start] = 0;
+
+        while (!pq.empty()) {
+        Node current = pq.top();
+        pq.pop();
+
+        if (current.vertex == goal) {
+            NumArr path;
+            int node = goal;
+
+            while (node != -1) {
+                path.push_back(node);
+                node = parent[node];
+            }
+
+            reverse(path.begin(), path.end());
+            return path;
+        }
+
+        for (int neighbor = 0; neighbor < n; ++neighbor) {
+            if (graph[current.vertex][neighbor] != 0) {
+                int newCost = current.cost + graph[current.vertex][neighbor];
+
+                if (newCost < cost[neighbor]) {
+                    cost[neighbor] = newCost;
+                    parent[neighbor] = current.vertex;
+                    pq.push({neighbor, newCost, heuristic[neighbor]});
+                }
+            }
+        }
+    }
+
+    return NumArr();
 }
