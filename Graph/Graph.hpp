@@ -18,7 +18,9 @@ public:
     void getGraphWeights();
     void inputGraph();
     void printMatrix();
-    void multiplyMatrices(const Matrix& A, const Matrix& B);
+    Matrix multiplyMatrices(const Matrix &matrix,const Matrix &matrix2);
+    Matrix getMatrixPow(int pow, const Matrix &matrix);
+    Matrix cloneMatrix(const Matrix &matrix1);
 private:
     Weights graphWeights;
     Matrix neighborMatrix;

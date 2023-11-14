@@ -82,18 +82,41 @@ void Graph::inputGraph() {
     getNeighborMatrix();
 }
 
-void Graph::multiplyMatrices(const Matrix& A, const Matrix& B) {
-    int rows_A = A.size();
-    int cols_A = A[0].size();
-    int cols_B = B[0].size();
+Matrix Graph::cloneMatrix(const Matrix &matrix) {
+    Matrix res;
+    for (const auto& row : matrix) {
+        res.push_back(row);
+        for (int element : row) {
+            res[res.size() -1].push_back(element);
+        }
+    }
 
+    return res;
+}
+
+Matrix Graph::getMatrixPow(int pow,const Matrix &matrix) {
+    Matrix res = cloneMatrix(neighborMatrix);
+    if(pow <= 2) {
+        return multiplyMatrices(res, neighborMatrix);
+    } else {
+        Matrix temp = multiplyMatrices(res, matrix);
+        return getMatrixPow(pow-1, temp);
+    }
+}
+
+Matrix Graph::multiplyMatrices(const Matrix &matrix1, const Matrix &matrix2) {
+    Matrix res = cloneMatrix(neighborMatrix);
+    int rows_A = matrix1.size();
+    int cols_A = matrix1[0].size();
+    int cols_B = matrix2[0].size();
     for (int i = 0; i < rows_A; ++i) {
         for (int j = 0; j < cols_B; ++j) {
             for (int k = 0; k < cols_A; ++k) {
-                neighborMatrix[i][j] += A[i][k] * B[k][j];
+                res[i][j] += res[i][k] * neighborMatrix[k][j];
             }
         }
     }
+    return res;
 }
 
 void Graph::printMatrix() {
