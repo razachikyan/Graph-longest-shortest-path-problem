@@ -87,8 +87,6 @@ void Graph::multiplyMatrices(const Matrix& A, const Matrix& B) {
     int cols_A = A[0].size();
     int cols_B = B[0].size();
 
-    // Matrix result(rows_A, std::vector<int>(cols_B, 0));
-
     for (int i = 0; i < rows_A; ++i) {
         for (int j = 0; j < cols_B; ++j) {
             for (int k = 0; k < cols_A; ++k) {

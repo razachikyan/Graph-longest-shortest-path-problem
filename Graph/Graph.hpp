@@ -25,14 +25,3 @@ private:
     int edgeCount;
     int nodeCount;
 };
-
-
-// Function to print a matrix
-void printMatrix(const Matrix& matrix) {
-    for (const auto& row : matrix) {
-        for (int element : row) {
-            std::cout << element << " ";
-        }
-        std::cout << std::endl;
-    }
-}
