@@ -9,9 +9,6 @@
 #include <algorithm>
 #include <climits>
 
-using NumArr = std::vector<int>;
-using Matrix = std::vector<NumArr>;
-using Weights = std::map<std::pair<int, int>, int>;
 struct Node {
     int vertex;
     int cost;
@@ -21,6 +18,10 @@ struct Node {
         return cost + heuristic > other.cost + other.heuristic;
     }
 };
+using NumArr = std::vector<int>;
+using Matrix = std::vector<NumArr>;
+using Weights = std::map<std::pair<int, int>, int>;
+using Nodes = std::vector<Node>;
 class Graph {
 public:
     Graph() {}
@@ -28,7 +29,7 @@ public:
     void getGraphWeights();
     void inputGraph();
     void printMatrix();
-    NumArr astar(const Matrix& graph, int start, int goal);
+    NumArr astar();
 private:
     Weights graphWeights;
     Matrix neighborMatrix;
