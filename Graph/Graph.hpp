@@ -8,6 +8,7 @@
 #include <queue>
 #include <algorithm>
 #include <climits>
+#include <limits>
 
 struct Node {
     int vertex;
@@ -30,9 +31,11 @@ public:
     void inputGraph();
     void printMatrix();
     NumArr astar();
+    NumArr dijkstra();
 private:
     Weights graphWeights;
     Matrix neighborMatrix;
     int edgeCount;
     int nodeCount;
+    const int INF = std::numeric_limits<int>::max();
 };

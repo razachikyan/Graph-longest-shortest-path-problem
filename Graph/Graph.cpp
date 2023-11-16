@@ -41,6 +41,42 @@ void Graph::getNeighborMatrix() {
     }
 };
 
+
+void Graph::printMatrix()
+{
+    std::cout << "  ";
+    for( int i = 0; i < neighborMatrix.size(); ++i )
+    {
+        std::cout << i << " ";
+    }
+    std::cout << std::endl;
+
+    for( int i = 0; i < neighborMatrix.size(); ++i )
+    {
+        std::cout << i << " ";
+        for( int j = 0; j < neighborMatrix.size(); ++j )
+        {
+            std::cout << neighborMatrix[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+void Graph::inputGraph()
+{
+    std::cout << "Input Node and Edge count: "; std::cin >> nodeCount >> edgeCount;
+
+    neighborMatrix = std::vector< std::vector< int > >( nodeCount, std::vector< int >( nodeCount, 0 ) );
+
+    for ( int i = 0; i < edgeCount; ++i )
+    {
+        int node1, node2, weight;
+        std::cout << "Input node_1, node_2 and weight: "; std::cin >> node1 >> node2 >> weight;
+        neighborMatrix[node1][node2] = weight;
+        neighborMatrix[node2][node1] = weight;
+    }
+}
+
 NumArr Graph::astar() {
     int start, target;
     std::cout << "enter start and target nodes"; std::cin>>start>>target;
@@ -87,37 +123,47 @@ NumArr Graph::astar() {
     return NumArr();
 }
 
-void Graph::printMatrix()
-{
-    std::cout << "  ";
-    for( int i = 0; i < neighborMatrix.size(); ++i )
-    {
-        std::cout << i << " ";
-    }
-    std::cout << std::endl;
+NumArr Graph::dijkstra() {
+    int start, target;
+    std::cout << "enter start and target nodes"; std::cin>>start>>target;
+    int n = neighborMatrix.size();
+    NumArr parent(n, -1);
+    NumArr distance(n, INF);
 
-    for( int i = 0; i < neighborMatrix.size(); ++i )
-    {
-        std::cout << i << " ";
-        for( int j = 0; j < neighborMatrix.size(); ++j )
-        {
-            std::cout << neighborMatrix[i][j] << " ";
+    std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq;
+
+    pq.push({start, 0});
+    distance[start] = 0;
+
+    while (!pq.empty()) {
+        Node current = pq.top();
+        pq.pop();
+
+        if (current.vertex == target) {
+            NumArr path;
+            int node = target;
+
+            while (node != -1) {
+                path.push_back(node);
+                node = parent[node];
+            }
+
+            std::reverse(path.begin(), path.end());
+            return path;
         }
-        std::cout << std::endl;
+
+        for (int neighbor = 0; neighbor < n; ++neighbor) {
+            if (neighborMatrix[current.vertex][neighbor] != 0) {
+                int newDistance = current.cost + neighborMatrix[current.vertex][neighbor];
+
+                if (newDistance < distance[neighbor]) {
+                    distance[neighbor] = newDistance;
+                    parent[neighbor] = current.vertex;
+                    pq.push({neighbor, newDistance});
+                }
+            }
+        }
     }
-}
 
-void Graph::inputGraph()
-{
-    std::cout << "Input Node and Edge count: "; std::cin >> nodeCount >> edgeCount;
-
-    neighborMatrix = std::vector< std::vector< int > >( nodeCount, std::vector< int >( nodeCount, 0 ) );
-
-    for ( int i = 0; i < edgeCount; ++i )
-    {
-        int node1, node2, weight;
-        std::cout << "Input node_1, node_2 and weight: "; std::cin >> node1 >> node2 >> weight;
-        neighborMatrix[node1][node2] = weight;
-        neighborMatrix[node2][node1] = weight;
-    }
+    return NumArr(); // Return an empty vector if no path found
 }
