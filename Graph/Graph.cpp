@@ -1,7 +1,7 @@
 #include "./Graph.hpp"
 
 void Graph::getGraphWeights() {
-    for(int i = 0; i < edgeCount; ++i) {
+    for (int i = 0; i < edgeCount; ++i) {
         std::string ans;
         std::cout << std::endl << i << " Enter node1 node2 and weight in this format [node1] [node2] [weight]";
         std::getline(std::cin, ans);
@@ -9,22 +9,22 @@ void Graph::getGraphWeights() {
         std::string word;
         int ind = 0;
         int weight;
-        std::pair<int, int> neighborNodes = {0, 0};
+        std::pair<int, int> neighborNodes = { 0, 0 };
         while (iss >> word) {
-            switch(ind) {
-                case 0: {
-                    neighborNodes.first = std::stoi(word);
-                    break;
-                }
-                case 1: {
-                    neighborNodes.second = std::stoi(word);
-                    break;
-                }
-                case 2: {
-                    weight = std::stoi(word);
-                    break;
-                }
-                default: throw std::runtime_error("Too meny input values. Not valid!.");
+            switch (ind) {
+            case 0: {
+                neighborNodes.first = std::stoi(word);
+                break;
+            }
+            case 1: {
+                neighborNodes.second = std::stoi(word);
+                break;
+            }
+            case 2: {
+                weight = std::stoi(word);
+                break;
+            }
+            default: throw std::runtime_error("Too meny input values. Not valid!.");
             }
             ++ind;
         }
@@ -33,8 +33,8 @@ void Graph::getGraphWeights() {
 };
 
 void Graph::getNeighborMatrix() {
-    for(int i = 0; i < nodeCount; ++ i) {
-        for(int j = 0; j < nodeCount; ++ j) {
+    for (int i = 0; i < nodeCount; ++i) {
+        for (int j = 0; j < nodeCount; ++j) {
             auto weight = graphWeights.find(std::make_pair(i, j));
             neighborMatrix[i][j] = (weight != graphWeights.end()) ? weight->second : 0;
         }
@@ -45,16 +45,16 @@ void Graph::getNeighborMatrix() {
 void Graph::printMatrix()
 {
     std::cout << "  ";
-    for( int i = 0; i < neighborMatrix.size(); ++i )
+    for (int i = 0; i < neighborMatrix.size(); ++i)
     {
         std::cout << i << " ";
     }
     std::cout << std::endl;
 
-    for( int i = 0; i < neighborMatrix.size(); ++i )
+    for (int i = 0; i < neighborMatrix.size(); ++i)
     {
         std::cout << i << " ";
-        for( int j = 0; j < neighborMatrix.size(); ++j )
+        for (int j = 0; j < neighborMatrix.size(); ++j)
         {
             std::cout << neighborMatrix[i][j] << " ";
         }
@@ -66,9 +66,9 @@ void Graph::inputGraph()
 {
     std::cout << "Input Node and Edge count: "; std::cin >> nodeCount >> edgeCount;
 
-    neighborMatrix = std::vector< std::vector< int > >( nodeCount, std::vector< int >( nodeCount, 0 ) );
+    neighborMatrix = std::vector< std::vector< int > >(nodeCount, std::vector< int >(nodeCount, 0));
 
-    for ( int i = 0; i < edgeCount; ++i )
+    for (int i = 0; i < edgeCount; ++i)
     {
         int node1, node2, weight;
         std::cout << "Input node_1, node_2 and weight: "; std::cin >> node1 >> node2 >> weight;
@@ -79,7 +79,7 @@ void Graph::inputGraph()
 
 NumArr Graph::astar() {
     int start, target;
-    std::cout << "enter start and target nodes"; std::cin>>start>>target;
+    std::cout << "enter start and target nodes"; std::cin >> start >> target;
     int n = neighborMatrix.size();
     NumArr parent(n, -1);
     NumArr cost(n, INT_MAX);
@@ -87,10 +87,10 @@ NumArr Graph::astar() {
 
     std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq;
 
-    pq.push({start, 0, 0});
+    pq.push({ start, 0, 0 });
     cost[start] = 0;
 
-        while (!pq.empty()) {
+    while (!pq.empty()) {
         Node current = pq.top();
         pq.pop();
 
@@ -114,7 +114,7 @@ NumArr Graph::astar() {
                 if (newCost < cost[neighbor]) {
                     cost[neighbor] = newCost;
                     parent[neighbor] = current.vertex;
-                    pq.push({neighbor, newCost, heuristic[neighbor]});
+                    pq.push({ neighbor, newCost, heuristic[neighbor] });
                 }
             }
         }
@@ -125,14 +125,14 @@ NumArr Graph::astar() {
 
 NumArr Graph::dijkstra() {
     int start, target;
-    std::cout << "enter start and target nodes"; std::cin>>start>>target;
+    std::cout << "enter start and target nodes"; std::cin >> start >> target;
     int n = neighborMatrix.size();
     NumArr parent(n, -1);
     NumArr distance(n, INF);
 
     std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq;
 
-    pq.push({start, 0});
+    pq.push({ start, 0 });
     distance[start] = 0;
 
     while (!pq.empty()) {
@@ -159,16 +159,16 @@ NumArr Graph::dijkstra() {
                 if (newDistance < distance[neighbor]) {
                     distance[neighbor] = newDistance;
                     parent[neighbor] = current.vertex;
-                    pq.push({neighbor, newDistance});
+                    pq.push({ neighbor, newDistance });
                 }
             }
         }
     }
 
-    return NumArr(); 
+    return NumArr();
 }
 
-NumArr getLongestPath(int populationSize, double crossoverRate, double mutationRate, int numGenerations) {
+NumArr Graph::getLongestPath(int populationSize, double crossoverRate, double mutationRate, int numGenerations) {
     auto initializePopulation = [this]() -> std::vector<NumArr> {
         Population population;
         for (int i = 0; i < populationSize; ++i) {
@@ -180,7 +180,7 @@ NumArr getLongestPath(int populationSize, double crossoverRate, double mutationR
             population.push_back(chromosome);
         }
         return population;
-    };
+        };
 
     auto calculateFitness = [this](const NumArr& chromosome) -> double {
         int pathLength = 0;
@@ -191,7 +191,8 @@ NumArr getLongestPath(int populationSize, double crossoverRate, double mutationR
             // Check if there is an edge between the current and next vertices in the neighborMatrix.
             if (currentVertex < neighborMatrix.size() && nextVertex < neighborMatrix.size()) {
                 pathLength += neighborMatrix[currentVertex][nextVertex];
-            } else {
+            }
+            else {
                 // Handle the case where the vertices are out of bounds.
                 // You may want to add an appropriate penalty.
                 // Here, we add a penalty equal to the maximum possible weight in the graph.
@@ -199,10 +200,10 @@ NumArr getLongestPath(int populationSize, double crossoverRate, double mutationR
             }
         }
 
-    // The fitness is inversely proportional to the path length.
-    // You might want to adjust this based on your specific problem.
+        // The fitness is inversely proportional to the path length.
+        // You might want to adjust this based on your specific problem.
         return 1.0 / static_cast<double>(pathLength + 1);
-    };
+        };
 
 
 
@@ -242,7 +243,7 @@ NumArr getLongestPath(int populationSize, double crossoverRate, double mutationR
 
         // Replace the old population with the selected one
         population = selectedChromosomes;
-    };
+        };
 
 
     auto crossover = [this](Population& population) {
@@ -269,7 +270,8 @@ NumArr getLongestPath(int populationSize, double crossoverRate, double mutationR
                 // Add the new offspring to the new population
                 newPopulation.push_back(offspring1);
                 newPopulation.push_back(offspring2);
-            } else {
+            }
+            else {
                 // If there's an odd number of chromosomes, just add the last one as is
                 newPopulation.push_back(population[i]);
             }
@@ -277,7 +279,7 @@ NumArr getLongestPath(int populationSize, double crossoverRate, double mutationR
 
         // Replace the old population with the new one
         population = newPopulation;
-    };
+        };
 
 
     auto mutation = [this](Population& population) {
@@ -297,7 +299,7 @@ NumArr getLongestPath(int populationSize, double crossoverRate, double mutationR
                 std::swap(chromosome[position1], chromosome[position2]);
             }
         }
-    };
+        };
 
 
     auto replacePopulation = [this](Population& population) {
@@ -317,7 +319,7 @@ NumArr getLongestPath(int populationSize, double crossoverRate, double mutationR
 
         // Clear the rest of the population
         population.resize(combinedPopulation.size() - elitismCount);
-    };
+        };
 
 
     auto evolve = [this, &initializePopulation, &calculateFitness, &selection, &crossover, &mutation, &replacePopulation](int numGenerations) {
@@ -328,12 +330,12 @@ NumArr getLongestPath(int populationSize, double crossoverRate, double mutationR
             mutation(population);
             replacePopulation(population);
         }
-    };
+        };
 
     auto getBestChromosome = [this](const std::vector<NumArr>& population) -> NumArr {
         // Extract the best chromosome from the final population as the solution.
         return population[0];
-    };
+        };
 
     // Initialize and evolve the population
     std::vector<NumArr> population = initializePopulation();
