@@ -23,6 +23,8 @@ using NumArr = std::vector<int>;
 using Matrix = std::vector<NumArr>;
 using Weights = std::map<std::pair<int, int>, int>;
 using Nodes = std::vector<Node>;
+using Population = std::vector<NumArr>
+
 class Graph {
 public:
     Graph() {}
@@ -32,6 +34,7 @@ public:
     void printMatrix();
     NumArr astar();
     NumArr dijkstra();
+    NumArr getLongestPath(int populationSize, double crossoverRate, double mutationRate, int numGenerations)
 private:
     Weights graphWeights;
     Matrix neighborMatrix;
