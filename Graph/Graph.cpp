@@ -168,182 +168,159 @@ NumArr Graph::dijkstra() {
     return NumArr();
 }
 
-NumArr Graph::getLongestPath(int populationSize, double crossoverRate, double mutationRate, int numGenerations) {
-    auto initializePopulation = [this]() -> std::vector<NumArr> {
-        Population population;
-        for (int i = 0; i < populationSize; ++i) {
-            NumArr chromosome;
-            for (int vertex = 0; vertex < neighborMatrix.size(); ++vertex) {
-                chromosome.push_back(vertex);
-            }
-            std::random_shuffle(chromosome.begin(), chromosome.end());
-            population.push_back(chromosome);
+Population Graph::initializePopulation() {
+    population.clear();
+    const int populationSize = 50;
+
+    for (int i = 0; i < populationSize; ++i) {
+        NumArr chromosome;
+        for (int vertex = 0; vertex < neighborMatrix.size(); ++vertex) {
+            chromosome.push_back(vertex);
         }
-        return population;
-        };
+        std::shuffle(chromosome.begin(), chromosome.end(), std::default_random_engine(std::random_device()()));
+        population.push_back(chromosome);
+    }
+}
 
-    auto calculateFitness = [this](const NumArr& chromosome) -> double {
-        int pathLength = 0;
-        for (size_t i = 0; i < chromosome.size() - 1; ++i) {
-            int currentVertex = chromosome[i];
-            int nextVertex = chromosome[i + 1];
 
-            // Check if there is an edge between the current and next vertices in the neighborMatrix.
-            if (currentVertex < neighborMatrix.size() && nextVertex < neighborMatrix.size()) {
+double Graph::calculateFitness(const NumArr& chromosome) {
+    const int maxPathLength = std::numeric_limits<int>::max();
+    int pathLength = 0;
+    for (size_t i = 0; i < chromosome.size() - 1; ++i) {
+        int currentVertex = chromosome[i];
+        int nextVertex = chromosome[i + 1];
+        if (currentVertex >= neighborMatrix.size() || nextVertex >= neighborMatrix.size()) {
+            pathLength += maxPathLength;
+        }
+        else {
+            if (neighborMatrix[currentVertex][nextVertex] < maxPathLength - pathLength) {
                 pathLength += neighborMatrix[currentVertex][nextVertex];
             }
             else {
-                // Handle the case where the vertices are out of bounds.
-                // You may want to add an appropriate penalty.
-                // Here, we add a penalty equal to the maximum possible weight in the graph.
-                pathLength += std::numeric_limits<int>::max();
+                pathLength = maxPathLength;
+                break;
             }
         }
-
-        // The fitness is inversely proportional to the path length.
-        // You might want to adjust this based on your specific problem.
-        return 1.0 / static_cast<double>(pathLength + 1);
-        };
-
-
-
-    auto selection = [this](Population& population) {
-        // Calculate total fitness of the population
-        double totalFitness = 0.0;
-        for (const auto& chromosome : population) {
-            totalFitness += calculateFitness(chromosome);
-        }
-
-        // Create a vector to store the cumulative probabilities
-        std::vector<double> cumulativeProbabilities;
-        cumulativeProbabilities.reserve(population.size());
-
-        // Calculate cumulative probabilities
-        double cumulativeProbability = 0.0;
-        for (const auto& chromosome : population) {
-            double probability = calculateFitness(chromosome) / totalFitness;
-            cumulativeProbability += probability;
-            cumulativeProbabilities.push_back(cumulativeProbability);
-        }
-
-        // Select chromosomes for reproduction
-        Population selectedChromosomes;
-        for (int i = 0; i < populationSize; ++i) {
-            double randomValue = static_cast<double>(rand()) / RAND_MAX; // Generate a random value between 0 and 1
-
-            // Find the chromosome whose cumulative probability is greater than the random value
-            auto selectedIt = std::upper_bound(cumulativeProbabilities.begin(), cumulativeProbabilities.end(), randomValue);
-
-            // Determine the index of the selected chromosome
-            int selectedIndex = static_cast<int>(std::distance(cumulativeProbabilities.begin(), selectedIt));
-
-            // Add the selected chromosome to the new population
-            selectedChromosomes.push_back(population[selectedIndex]);
-        }
-
-        // Replace the old population with the selected one
-        population = selectedChromosomes;
-        };
-
-
-    auto crossover = [this](Population& population) {
-        Population newPopulation;
-
-        // Perform crossover for pairs of chromosomes
-        for (size_t i = 0; i < population.size(); i += 2) {
-            // Ensure we have at least two chromosomes remaining
-            if (i + 1 < population.size()) {
-                // Select two parent chromosomes
-                const NumArr& parent1 = population[i];
-                const NumArr& parent2 = population[i + 1];
-
-                // Choose a random crossover point
-                size_t crossoverPoint = rand() % (parent1.size() - 1) + 1; // Avoid crossover at the ends
-
-                // Create two new offspring chromosomes using one-point crossover
-                NumArr offspring1(parent1.begin(), parent1.begin() + crossoverPoint);
-                offspring1.insert(offspring1.end(), parent2.begin() + crossoverPoint, parent2.end());
-
-                NumArr offspring2(parent2.begin(), parent2.begin() + crossoverPoint);
-                offspring2.insert(offspring2.end(), parent1.begin() + crossoverPoint, parent1.end());
-
-                // Add the new offspring to the new population
-                newPopulation.push_back(offspring1);
-                newPopulation.push_back(offspring2);
-            }
-            else {
-                // If there's an odd number of chromosomes, just add the last one as is
-                newPopulation.push_back(population[i]);
-            }
-        }
-
-        // Replace the old population with the new one
-        population = newPopulation;
-        };
-
-
-    auto mutation = [this](Population& population) {
-        const double mutationRate = 0.1; // Adjust the mutation rate as needed
-
-        for (auto& chromosome : population) {
-            // Randomly decide whether to apply mutation
-            if ((static_cast<double>(rand()) / RAND_MAX) < mutationRate) {
-                // Choose two distinct positions for swap mutation
-                size_t position1 = rand() % chromosome.size();
-                size_t position2;
-                do {
-                    position2 = rand() % chromosome.size();
-                } while (position1 == position2);
-
-                // Perform swap mutation
-                std::swap(chromosome[position1], chromosome[position2]);
-            }
-        }
-        };
-
-
-    auto replacePopulation = [this](Population& population) {
-        const size_t elitismCount = 2; // Adjust the number of top individuals to preserve
-
-        // Combine the old and new populations
-        Population combinedPopulation = population;
-
-        // Sort the combined population based on fitness
-        std::sort(combinedPopulation.begin(), combinedPopulation.end(),
-            [this](const NumArr& a, const NumArr& b) {
-                return calculateFitness(a) > calculateFitness(b);
-            });
-
-        // Select the top individuals (elitism)
-        population.assign(combinedPopulation.begin(), combinedPopulation.begin() + elitismCount);
-
-        // Clear the rest of the population
-        population.resize(combinedPopulation.size() - elitismCount);
-        };
-
-
-    auto evolve = [this, &initializePopulation, &calculateFitness, &selection, &crossover, &mutation, &replacePopulation](int numGenerations) {
-        Population population = initializePopulation();
-        for (int generation = 0; generation < numGenerations; ++generation) {
-            selection(population);
-            crossover(population);
-            mutation(population);
-            replacePopulation(population);
-        }
-        };
-
-    auto getBestChromosome = [this](const std::vector<NumArr>& population) -> NumArr {
-        // Extract the best chromosome from the final population as the solution.
-        return population[0];
-        };
-
-    // Initialize and evolve the population
-    std::vector<NumArr> population = initializePopulation();
-    evolve(numGenerations);
-
-    // Retrieve the best chromosome from the final population.
-    NumArr bestChromosome = getBestChromosome(population);
-
-    // Return the best path found.
-    return bestChromosome;
+    }
+    return (pathLength == 0) ? std::numeric_limits<double>::infinity() : 1.0 / static_cast<double>(pathLength + 1);
 }
+
+void Graph::selection() {
+    const int populationSize = 50;
+    double totalFitness = 0.0;
+    std::vector<double> fitnessValues;
+    fitnessValues.reserve(population.size());
+    for (const auto& chromosome : population) {
+        double fitness = calculateFitness(chromosome);
+        totalFitness += fitness;
+        fitnessValues.push_back(fitness);
+    }
+
+    std::vector<double> cumulativeProbabilities;
+    cumulativeProbabilities.reserve(population.size());
+    double cumulativeProbability = 0.0;
+    for (double fitness : fitnessValues) {
+        double probability = fitness / totalFitness;
+        cumulativeProbability += probability;
+        cumulativeProbabilities.push_back(cumulativeProbability);
+    }
+    Population selectedChromosomes;
+
+    for (int i = 0; i < populationSize; ++i) {
+        double randomValue = static_cast<double>(rand()) / RAND_MAX;
+        auto selectedIt = std::upper_bound(cumulativeProbabilities.begin(), cumulativeProbabilities.end(), randomValue);
+        int selectedIndex = static_cast<int>(std::distance(cumulativeProbabilities.begin(), selectedIt));
+        selectedChromosomes.push_back(population[selectedIndex]);
+    }
+
+    population = selectedChromosomes;
+}
+
+
+void Graph::crossover() {
+    Population newPopulation;
+    const size_t crossoverPointRange = 1;
+
+    for (size_t i = 0; i < population.size(); i += 2) {
+        if (i + 1 < population.size()) {
+            const NumArr& parent1 = population[i];
+            const NumArr& parent2 = population[i + 1];
+            size_t crossoverPoint = rand() % (parent1.size() - crossoverPointRange) + crossoverPointRange;
+            NumArr offspring1(parent1.begin(), parent1.begin() + crossoverPoint);
+            offspring1.insert(offspring1.end(), parent2.begin() + crossoverPoint, parent2.end());
+            NumArr offspring2(parent2.begin(), parent2.begin() + crossoverPoint);
+            offspring2.insert(offspring2.end(), parent1.begin() + crossoverPoint, parent1.end());
+            newPopulation.push_back(offspring1);
+            newPopulation.push_back(offspring2);
+        }
+        else {
+            newPopulation.push_back(population[i]);
+        }
+    }
+
+    population = newPopulation;
+}
+
+
+void Graph::mutation() {
+    const double mutationRate = 0.1;
+    auto getRandomPosition = [&]() -> size_t {
+        return rand() % population.front().size();
+        };
+
+    for (auto& chromosome : population) {
+        if ((static_cast<double>(rand()) / RAND_MAX) < mutationRate) {
+            size_t position1 = getRandomPosition();
+            size_t position2;
+            do {
+                position2 = getRandomPosition();
+            } while (position1 == position2);
+
+            std::swap(chromosome[position1], chromosome[position2]);
+        }
+    }
+}
+
+
+void Graph::replacePopulation() {
+    const size_t elitismCount = 2;
+    Population combinedPopulation = population;
+    std::sort(combinedPopulation.begin(), combinedPopulation.end(),
+        [this](const NumArr& a, const NumArr& b) {
+            return calculateFitness(a) > calculateFitness(b);
+        });
+
+    population.assign(combinedPopulation.begin(), combinedPopulation.begin() + elitismCount);
+    population.resize(combinedPopulation.size() - elitismCount);
+}
+
+
+void Graph::evolve() {
+    const int numGenerations = 100;
+    for (int generation = 0; generation < numGenerations; ++generation) {
+        selection();
+        crossover();
+        mutation();
+        replacePopulation();
+    }
+}
+
+NumArr Graph::getBestChromosome() {
+    return population[0];
+}
+
+NumArr Graph::getLongestPath() {
+    initializePopulation();
+
+    for (int generation = 0; generation < 100; ++generation) {
+        selection();
+        crossover();
+        mutation();
+        replacePopulation();
+    }
+
+    return getBestChromosome();
+}
+
+
+

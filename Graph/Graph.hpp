@@ -35,10 +35,21 @@ public:
     void printMatrix();
     NumArr astar();
     NumArr dijkstra();
-    NumArr getLongestPath(int populationSize, double crossoverRate, double mutationRate, int numGenerations);
+    NumArr getLongestPath();
 private:
     Weights graphWeights;
     Matrix neighborMatrix;
+
+    Population initializePopulation();
+    double calculateFitness(const NumArr& chromosome);
+    void selection();
+    void crossover();
+    void mutation();
+    void replacePopulation();
+    void evolve();
+    NumArr getBestChromosome();
+
+    Population population;
     int edgeCount;
     int nodeCount;
     const int INF = std::numeric_limits<int>::max();
