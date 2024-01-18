@@ -311,16 +311,11 @@ NumArr Graph::getBestChromosome() {
 
 NumArr Graph::getLongestPath() {
     initializePopulation();
-
-    for (int generation = 0; generation < 100; ++generation) {
-        selection();
-        crossover();
-        mutation();
-        replacePopulation();
-    }
+    evolve();
 
     return getBestChromosome();
 }
+
 
 
 
