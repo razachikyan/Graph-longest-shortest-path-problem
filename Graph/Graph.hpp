@@ -36,10 +36,12 @@ public:
     NumArr astar();
     NumArr dijkstra();
     NumArr getLongestPath();
+
 private:
     Weights graphWeights;
     Matrix neighborMatrix;
-
+    Population population;
+private:
     Population initializePopulation();
     double calculateFitness(const NumArr& chromosome);
     void selection();
@@ -49,7 +51,7 @@ private:
     void evolve();
     NumArr getBestChromosome();
 
-    Population population;
+private:
     int edgeCount;
     int nodeCount;
     const int INF = std::numeric_limits<int>::max();
