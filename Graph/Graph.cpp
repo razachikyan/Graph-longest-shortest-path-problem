@@ -315,7 +315,3 @@ NumArr Graph::getLongestPath() {
 
     return getBestChromosome();
 }
-
-
-
-
