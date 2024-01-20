@@ -1,9 +1,10 @@
 #include "./Graph.hpp"
 
 void Graph::getGraphWeights() {
+    std::cout << "Enter node1 node2 and weight in this format\n\n";
     for (int i = 0; i < edgeCount; ++i) {
         std::string ans;
-        std::cout << std::endl << i << " Enter node1 node2 and weight in this format [node1] [node2] [weight]";
+        std::cout << std::endl << i << " [node1] [node2] [weight]: ";
         std::getline(std::cin, ans);
         std::istringstream iss(ans);
         std::string word;
@@ -33,13 +34,16 @@ void Graph::getGraphWeights() {
 };
 
 void Graph::getNeighborMatrix() {
-    for (int i = 0; i < nodeCount; ++i) {
-        for (int j = 0; j < nodeCount; ++j) {
-            auto weight = graphWeights.find(std::make_pair(i, j));
-            neighborMatrix[i][j] = (weight != graphWeights.end()) ? weight->second : 0;
-        }
+    neighborMatrix = std::vector< std::vector< int > >( nodeCount, std::vector< int >( nodeCount, 0 ) );
+
+    for (auto &pair: graphWeights)
+    {
+        int node1 = pair.first.first, node2 = pair.first.second, weight = pair.second;
+        neighborMatrix[node1][node2] = weight;
+        neighborMatrix[node2][node1] = weight;
     }
 };
+
 
 
 void Graph::printMatrix()
@@ -66,16 +70,10 @@ void Graph::inputGraph()
 {
     std::cout << "Input Node and Edge count: "; std::cin >> nodeCount >> edgeCount;
 
-    neighborMatrix = std::vector< std::vector< int > >(nodeCount, std::vector< int >(nodeCount, 0));
-
-    for (int i = 0; i < edgeCount; ++i)
-    {
-        int node1, node2, weight;
-        std::cout << "Input node_1, node_2 and weight: "; std::cin >> node1 >> node2 >> weight;
-        neighborMatrix[node1][node2] = weight;
-        neighborMatrix[node2][node1] = weight;
-    }
+    getGraphWeights();
+    getNeighborMatrix();
 }
+
 
 NumArr Graph::astar() {
     int start, target;
@@ -175,6 +173,7 @@ Population Graph::initializePopulation() {
     for (int i = 0; i < populationSize; ++i) {
         NumArr chromosome;
         for (int vertex = 0; vertex < neighborMatrix.size(); ++vertex) {
+            std::cout << neighborMatrix.size() << "/" << vertex << std::endl;
             chromosome.push_back(vertex);
         }
         std::shuffle(chromosome.begin(), chromosome.end(), std::default_random_engine(std::random_device()()));
@@ -309,9 +308,19 @@ NumArr Graph::getBestChromosome() {
     return population[0];
 }
 
-NumArr Graph::getLongestPath() {
+NumArr Graph::genetic() {
     initializePopulation();
     evolve();
 
     return getBestChromosome();
+}
+
+NumArr Graph::getLongestPath() {
+    NumArr path;
+    for (auto &weight:graphWeights) {
+        weight.second *=-1;
+    }
+    getNeighborMatrix();
+    path = astar();
+    return path;
 }

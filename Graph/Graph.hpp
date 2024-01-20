@@ -35,6 +35,7 @@ public:
     void printMatrix();
     NumArr astar();
     NumArr dijkstra();
+    NumArr genetic();
     NumArr getLongestPath();
 
 private:
