@@ -19,7 +19,7 @@ void Graph::getNeighborMatrix() {
     }
 };
 
-void Graph::printMatrix()
+void Graph::printGraph()
 {
     std::cout << "  ";
     for (int i = 0; i < graph.size(); ++i)
@@ -37,6 +37,13 @@ void Graph::printMatrix()
         }
         std::cout << std::endl;
     }
+}
+
+void Graph::printPath(NumArr& path) {
+    for (int i = 0; i < path.size(); ++i) {
+        std::cout << path[i] << " ";
+    }
+    std::cout << std::endl;
 }
 
 void Graph::inputGraph()
@@ -65,12 +72,12 @@ void Graph::readGraphFromFile(const std::string& path) {
     for (const auto& pair : graphWeights) {
         nodeCount = std::max(nodeCount, std::max(pair.first.first, pair.first.second));
     }
-    nodeCount++;  
+    nodeCount++;
 
     edgeCount = graphWeights.size();
 
     getNeighborMatrix();
-    printMatrix();
+    printGraph();
 };
 
 NumArr Graph::astar() {
@@ -311,14 +318,4 @@ NumArr Graph::genetic() {
     evolve();
 
     return getBestChromosome();
-}
-
-NumArr Graph::getLongestPath() {
-    NumArr path;
-    for (auto& weight : graphWeights) {
-        weight.second *= -1;
-    }
-    getNeighborMatrix();// working code
-    path = this->dijkstra();
-    return path;
 }

@@ -34,11 +34,11 @@ public:
     void getGraphWeights();
     void inputGraph();
     void readGraphFromFile(const std::string& path);
-    void printMatrix();
+    void printGraph();
+    void printPath(NumArr& path);
     NumArr astar();
     NumArr dijkstra();
     NumArr genetic();
-    NumArr getLongestPath();
 
 private:
     Weights graphWeights;
