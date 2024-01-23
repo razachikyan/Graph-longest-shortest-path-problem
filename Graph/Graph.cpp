@@ -1,43 +1,20 @@
 #include "./Graph.hpp"
 
 void Graph::getGraphWeights() {
-    std::cout << "Enter node1 node2 and weight in this format\n\n";
     for (int i = 0; i < edgeCount; ++i) {
-        std::string ans;
-        std::cout << std::endl << i << " [node1] [node2] [weight]: ";
-        std::getline(std::cin, ans);
-        std::istringstream iss(ans);
-        std::string word;
-        int ind = 0;
-        int weight;
         std::pair<int, int> neighborNodes = { 0, 0 };
-        while (iss >> word) {
-            switch (ind) {
-            case 0: {
-                neighborNodes.first = std::stoi(word);
-                break;
-            }
-            case 1: {
-                neighborNodes.second = std::stoi(word);
-                break;
-            }
-            case 2: {
-                weight = std::stoi(word);
-                break;
-            }
-            default: throw std::runtime_error("Too meny input values. Not valid!.");
-            }
-            ++ind;
-        }
+        int weight;
+        std::cout << "Input node_1, node_2 and weight: "; std::cin >> neighborNodes.first >> neighborNodes.second >> weight;
         graphWeights[neighborNodes] = weight;
     }
 };
 
 void Graph::getNeighborMatrix() {
-    neighborMatrix = std::vector< std::vector< int > >( nodeCount, std::vector< int >( nodeCount, 0 ) );
+    neighborMatrix = std::vector< std::vector< int > >(nodeCount, std::vector< int >(nodeCount, 0));
 
-    for (auto &pair: graphWeights)
+    for (auto& pair : graphWeights)
     {
+        std::cout << "\t\titeration\n";
         int node1 = pair.first.first, node2 = pair.first.second, weight = pair.second;
         neighborMatrix[node1][node2] = weight;
         neighborMatrix[node2][node1] = weight;
@@ -317,10 +294,10 @@ NumArr Graph::genetic() {
 
 NumArr Graph::getLongestPath() {
     NumArr path;
-    for (auto &weight:graphWeights) {
-        weight.second *=-1;
-    }
-    getNeighborMatrix();
-    path = astar();
+    for (auto& weight : graphWeights) {
+        weight.second *= -1;
+    } 
+    getNeighborMatrix();// working code
+    path = this->dijkstra();
     return path;
 }
