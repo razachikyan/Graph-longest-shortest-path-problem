@@ -54,6 +54,7 @@
     "xutility": "cpp",
     "string": "cpp",
     "sstream": "cpp",
-    "random": "cpp"
+    "random": "cpp",
+    "fstream": "cpp"
   }
 }

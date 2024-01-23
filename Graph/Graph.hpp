@@ -10,6 +10,7 @@
 #include <climits>
 #include <limits>
 #include <random>
+#include <fstream>
 
 struct Node {
     int vertex;
@@ -32,6 +33,7 @@ public:
     void getNeighborMatrix();
     void getGraphWeights();
     void inputGraph();
+    void readGraphFromFile(const std::string& path);
     void printMatrix();
     NumArr astar();
     NumArr dijkstra();
@@ -40,7 +42,7 @@ public:
 
 private:
     Weights graphWeights;
-    Matrix neighborMatrix;
+    Matrix graph;
     Population population;
 private:
     Population initializePopulation();

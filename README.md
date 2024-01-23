@@ -25,13 +25,13 @@
 - Input the graph step by step in consloe.
 
 - input the start and target node.
-![Console](./ReadmeFiles/console.png)
-![Graph](./ReadmeFiles/graph.png)
+![Console](./public/console.png)
+![Graph](./public/graph.png)
 
 ## Dijkstra algorithm
 
 - Input the graph step by step in consloe.
 - input the start and target node.
 
-![Dijkstra](./ReadmeFiles/dijkstra.png)
-![Graph](./ReadmeFiles/graph.png)
+![Dijkstra](./public/dijkstra.png)
+![Graph](./public/graph.png)

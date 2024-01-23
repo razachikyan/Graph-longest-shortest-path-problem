@@ -10,34 +10,30 @@ void Graph::getGraphWeights() {
 };
 
 void Graph::getNeighborMatrix() {
-    neighborMatrix = std::vector< std::vector< int > >(nodeCount, std::vector< int >(nodeCount, 0));
-
+    graph = std::vector< std::vector< int > >(nodeCount, std::vector< int >(nodeCount, 0)); // defone from map
     for (auto& pair : graphWeights)
     {
-        std::cout << "\t\titeration\n";
         int node1 = pair.first.first, node2 = pair.first.second, weight = pair.second;
-        neighborMatrix[node1][node2] = weight;
-        neighborMatrix[node2][node1] = weight;
+        graph[node1][node2] = weight;
+        graph[node2][node1] = weight;
     }
 };
-
-
 
 void Graph::printMatrix()
 {
     std::cout << "  ";
-    for (int i = 0; i < neighborMatrix.size(); ++i)
+    for (int i = 0; i < graph.size(); ++i)
     {
         std::cout << i << " ";
     }
     std::cout << std::endl;
 
-    for (int i = 0; i < neighborMatrix.size(); ++i)
+    for (int i = 0; i < graph.size(); ++i)
     {
         std::cout << i << " ";
-        for (int j = 0; j < neighborMatrix.size(); ++j)
+        for (int j = 0; j < graph.size(); ++j)
         {
-            std::cout << neighborMatrix[i][j] << " ";
+            std::cout << graph[i][j] << " ";
         }
         std::cout << std::endl;
     }
@@ -51,11 +47,36 @@ void Graph::inputGraph()
     getNeighborMatrix();
 }
 
+void Graph::readGraphFromFile(const std::string& path) {
+    std::ifstream inputFile(path);
+    if (!inputFile.is_open()) {
+        std::cerr << "Error opening file!" << std::endl;
+        return;
+    }
+
+    int node1, node2, weight;
+    while (inputFile >> node1 >> node2 >> weight) {
+        graphWeights[std::make_pair(node1, node2)] = weight;
+    }
+
+    inputFile.close();
+
+    nodeCount = 0;
+    for (const auto& pair : graphWeights) {
+        nodeCount = std::max(nodeCount, std::max(pair.first.first, pair.first.second));
+    }
+    nodeCount++;  
+
+    edgeCount = graphWeights.size();
+
+    getNeighborMatrix();
+    printMatrix();
+};
 
 NumArr Graph::astar() {
     int start, target;
     std::cout << "enter start and target nodes"; std::cin >> start >> target;
-    int n = neighborMatrix.size();
+    int n = graph.size();
     NumArr parent(n, -1);
     NumArr cost(n, INT_MAX);
     NumArr heuristic(n, 0);
@@ -83,8 +104,8 @@ NumArr Graph::astar() {
         }
 
         for (int neighbor = 0; neighbor < n; ++neighbor) {
-            if (neighborMatrix[current.vertex][neighbor] != 0) {
-                int newCost = current.cost + neighborMatrix[current.vertex][neighbor];
+            if (graph[current.vertex][neighbor] != 0) {
+                int newCost = current.cost + graph[current.vertex][neighbor];
 
                 if (newCost < cost[neighbor]) {
                     cost[neighbor] = newCost;
@@ -101,7 +122,7 @@ NumArr Graph::astar() {
 NumArr Graph::dijkstra() {
     int start, target;
     std::cout << "enter start and target nodes"; std::cin >> start >> target;
-    int n = neighborMatrix.size();
+    int n = graph.size();
     NumArr parent(n, -1);
     NumArr distance(n, INF);
 
@@ -128,8 +149,8 @@ NumArr Graph::dijkstra() {
         }
 
         for (int neighbor = 0; neighbor < n; ++neighbor) {
-            if (neighborMatrix[current.vertex][neighbor] != 0) {
-                int newDistance = current.cost + neighborMatrix[current.vertex][neighbor];
+            if (graph[current.vertex][neighbor] != 0) {
+                int newDistance = current.cost + graph[current.vertex][neighbor];
 
                 if (newDistance < distance[neighbor]) {
                     distance[neighbor] = newDistance;
@@ -149,8 +170,8 @@ Population Graph::initializePopulation() {
 
     for (int i = 0; i < populationSize; ++i) {
         NumArr chromosome;
-        for (int vertex = 0; vertex < neighborMatrix.size(); ++vertex) {
-            std::cout << neighborMatrix.size() << "/" << vertex << std::endl;
+        for (int vertex = 0; vertex < graph.size(); ++vertex) {
+            std::cout << graph.size() << "/" << vertex << std::endl;
             chromosome.push_back(vertex);
         }
         std::shuffle(chromosome.begin(), chromosome.end(), std::default_random_engine(std::random_device()()));
@@ -165,12 +186,12 @@ double Graph::calculateFitness(const NumArr& chromosome) {
     for (size_t i = 0; i < chromosome.size() - 1; ++i) {
         int currentVertex = chromosome[i];
         int nextVertex = chromosome[i + 1];
-        if (currentVertex >= neighborMatrix.size() || nextVertex >= neighborMatrix.size()) {
+        if (currentVertex >= graph.size() || nextVertex >= graph.size()) {
             pathLength += maxPathLength;
         }
         else {
-            if (neighborMatrix[currentVertex][nextVertex] < maxPathLength - pathLength) {
-                pathLength += neighborMatrix[currentVertex][nextVertex];
+            if (graph[currentVertex][nextVertex] < maxPathLength - pathLength) {
+                pathLength += graph[currentVertex][nextVertex];
             }
             else {
                 pathLength = maxPathLength;
@@ -296,7 +317,7 @@ NumArr Graph::getLongestPath() {
     NumArr path;
     for (auto& weight : graphWeights) {
         weight.second *= -1;
-    } 
+    }
     getNeighborMatrix();// working code
     path = this->dijkstra();
     return path;
