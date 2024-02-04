@@ -331,3 +331,33 @@ NumArr Graph::getShortestPath() {
     std::cout << "enter start and target nodes"; std::cin >> start >> target;
     NumArr path = strategy->execute(graph, start, target);
 }
+
+void Graph::draw() {
+    GVC_t *gvc;
+    Agraph_t *aGraph;
+
+    gvc = gvContext();
+
+    aGraph = agopen("myGraph", Agundirected, NULL);
+
+    Agnode_t *nodes[graph.size()];
+    for (int i = 0; i < graph.size(); ++i) {
+        char nodeName[5]; // 5 - Graph name length
+        sprintf(nodeName, "%d",  i + 1);
+        nodes[i] = agnode(aGraph, nodeName, 1);
+    }
+
+    for (int i = 0; i < graph.size(); ++i) {
+        for (int j = i + 1; j < graph.size(); ++j) {
+            if (graph[i][j] != 0) {
+                agedge(aGraph, nodes[i], nodes[j], nullptr, graph[i][j]);
+            }
+        }
+    }
+
+    gvLayout(gvc, aGraph, "dot");
+    gvRenderFilename(gvc, aGraph, "png", "output.png");
+    gvFreeLayout(gvc, aGraph);
+    agclose(aGraph);
+    gvFreeContext(gvc);
+}

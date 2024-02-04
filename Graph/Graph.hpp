@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <fstream>
 #include <memory>
+#include "../include/graphviz/gvc.h"
 
 #include "./Strategy/Strategy.hpp"
 
@@ -32,6 +33,7 @@ public:
     NumArr genetic();
     void setStrategy(std::string strategyType);
     NumArr getShortestPath();
+    void draw();
 private:
     Weights graphWeights;
     Matrix graph;
