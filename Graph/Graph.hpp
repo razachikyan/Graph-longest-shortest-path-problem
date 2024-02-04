@@ -10,7 +10,10 @@
 #include <climits>
 #include <limits>
 #include <random>
+#include <stdexcept>
 #include <fstream>
+
+#include "./Strategy/Strategy.hpp"
 
 struct Node {
     int vertex;
@@ -21,6 +24,7 @@ struct Node {
         return cost + heuristic > other.cost + other.heuristic;
     }
 };
+
 using NumArr = std::vector<int>;
 using Matrix = std::vector<NumArr>;
 using Weights = std::map<std::pair<int, int>, int>;
@@ -39,11 +43,13 @@ public:
     NumArr astar();
     NumArr dijkstra();
     NumArr genetic();
-
+    void setStrategy(std::string strategyType);
+    NumArr getShortestPath();
 private:
     Weights graphWeights;
     Matrix graph;
     Population population;
+    Strategy strategy;
 private:
     Population initializePopulation();
     double calculateFitness(const NumArr& chromosome);

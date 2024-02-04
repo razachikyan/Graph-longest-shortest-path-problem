@@ -319,3 +319,19 @@ NumArr Graph::genetic() {
 
     return getBestChromosome();
 }
+
+void Graph::setStrategy(std::string strategyType) {
+    if(strategyType == "dijkstra") {
+        this->strategy = new DijkstraStrategy();
+    } else if(strategyType == "astar") {
+        this->strategy = new AStarStrategy();
+    } else {
+        throw std::runtime_error("Incorrect strategy type");
+    }
+}
+
+NumArr Graph::getShortestPath() {
+    int start, target;
+    std::cout << "enter start and target nodes"; std::cin >> start >> target;
+    NumArr path = strategy.execute(graph, start, target);
+}
