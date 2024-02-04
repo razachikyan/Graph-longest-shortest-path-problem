@@ -1,6 +1,6 @@
 #include "./Strategy.hpp"
 
-NumArr AStarStrategy::execute(Matrix graph, int start, int end) {
+NumArr AStarStrategy::execute(Matrix graph, int start, int end) const {
     int n = graph.size();
     NumArr parent(n, -1);
     NumArr cost(n, INT_MAX);
@@ -44,7 +44,7 @@ NumArr AStarStrategy::execute(Matrix graph, int start, int end) {
     return NumArr();
 }
 
-NumArr DijkstraStrategy::execute(Matrix graph, int start, int end) {
+NumArr DijkstraStrategy::execute(Matrix graph, int start, int end) const {
     int n = graph.size();
     const int INF = std::numeric_limits<int>::max();
     NumArr parent(n, -1);

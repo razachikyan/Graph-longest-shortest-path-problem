@@ -316,22 +316,18 @@ NumArr Graph::getBestChromosome() {
 NumArr Graph::genetic() {
     initializePopulation();
     evolve();
-
     return getBestChromosome();
 }
 
 void Graph::setStrategy(std::string strategyType) {
-    if(strategyType == "dijkstra") {
-        this->strategy = new DijkstraStrategy();
-    } else if(strategyType == "astar") {
-        this->strategy = new AStarStrategy();
-    } else {
-        throw std::runtime_error("Incorrect strategy type");
-    }
+    if(strategyType == "dijkstra") this->strategy = std::make_unique<DijkstraStrategy>();
+    else if(strategyType == "astar") this->strategy = std::make_unique<AStarStrategy>();
+    else throw std::runtime_error("Incorrect strategy type");
 }
 
 NumArr Graph::getShortestPath() {
+    if(!this->strategy) throw std::runtime_error("Strategy novu");
     int start, target;
     std::cout << "enter start and target nodes"; std::cin >> start >> target;
-    NumArr path = strategy.execute(graph, start, target);
+    NumArr path = strategy->execute(graph, start, target);
 }

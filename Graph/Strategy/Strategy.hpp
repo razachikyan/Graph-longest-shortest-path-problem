@@ -1,7 +1,10 @@
 #pragma once
 
 #include <queue>
-#include "vector"
+#include <vector>
+#include <limits.h>
+#include <limits>
+#include <algorithm>
 
 using NumArr = std::vector<int>;
 using Matrix = std::vector<NumArr>;
@@ -24,10 +27,10 @@ public:
 
 class AStarStrategy:public Strategy {
 public:
-    NumArr execute(Matrix graph, int start, int end);
+    NumArr execute(Matrix graph, int start, int end) const override;
 };
 
 class DijkstraStrategy:public Strategy {
 public:
-    NumArr execute(Matrix graph, int start, int end);
+    NumArr execute(Matrix graph, int start, int end)  const override;
 };

@@ -6,34 +6,21 @@
 #include <sstream>
 #include <utility>
 #include <queue>
-#include <algorithm>
 #include <climits>
-#include <limits>
 #include <random>
 #include <stdexcept>
 #include <fstream>
+#include <memory>
 
 #include "./Strategy/Strategy.hpp"
 
-struct Node {
-    int vertex;
-    int cost;
-    int heuristic;
-
-    bool operator>(const Node& other) const {
-        return cost + heuristic > other.cost + other.heuristic;
-    }
-};
-
-using NumArr = std::vector<int>;
-using Matrix = std::vector<NumArr>;
 using Weights = std::map<std::pair<int, int>, int>;
 using Nodes = std::vector<Node>;
 using Population = std::vector<NumArr>;
 
 class Graph {
 public:
-    Graph() {}
+    Graph(): strategy(nullptr) {}
     void getNeighborMatrix();
     void getGraphWeights();
     void inputGraph();
@@ -49,7 +36,7 @@ private:
     Weights graphWeights;
     Matrix graph;
     Population population;
-    Strategy strategy;
+    std::unique_ptr<Strategy> strategy;
 private:
     Population initializePopulation();
     double calculateFitness(const NumArr& chromosome);
