@@ -22,13 +22,14 @@ void Graph::getNeighborMatrix() {
 };
 
 void Graph::printGraph() {
-    std::cout << "\t";
-    for (int i = 0; i < graph.size(); ++i) std::cout << i << " ";
+    std::cout << std::left << std::setfill(' ') << std::setw(4);
+    for (int i = 0; i < graph.size(); ++i) std::cout << i << std::left << std::setfill(' ') << std::setw(3);
+    std::cout << std::endl;
     std::cout << std::endl;
 
     for (int i = 0; i < graph.size(); ++i) {
-        std::cout << i << " ";
-        for (int j = 0; j < graph.size(); ++j) std::cout << graph[i][j] << " ";
+        std::cout << i << std::left << std::setfill(' ') << std::setw(4);
+        for (int j = 0; j < graph.size(); ++j) std::cout << graph[i][j] << std::left << std::setfill(' ') << std::setw(3);
         std::cout << std::endl;
     }
 }
@@ -271,9 +272,12 @@ void Graph::setStrategy(std::string strategyType) {
 
 NumArr Graph::getShortestPath() {
     if(!this->strategy) throw std::runtime_error("Choose strategy for getting shortest path");
-    int start, target;
+    std::string start, target;
     std::cout << "enter start and target nodes [a b]:: "; std::cin >> start >> target;
-    NumArr path = strategy->execute(graph, start, target);
+    int node1 = findNodeByName(start);
+    int node2 = findNodeByName(target);
+    if(node1 != -1 && node2 != -1) return strategy->execute(graph, node1, node2);
+    return {};
 }
 
 int Graph::findNodeByName(std::string name) {
