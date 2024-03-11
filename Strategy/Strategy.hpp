@@ -1,28 +1,24 @@
 #pragma once
 
-#include <queue>
-#include <vector>
-#include <limits.h>
-#include <limits>
-#include <algorithm>
+#include "../libs.hpp"
 
 using NumArr = std::vector<int>;
 using Matrix = std::vector<NumArr>;
 
-struct Node {
-    int vertex;
+struct NodeStr {
     int cost;
+    int vertex;
     int heuristic;
 
-    bool operator>(const Node& other) const {
+    bool operator>(const NodeStr& other) const {
         return cost + heuristic > other.cost + other.heuristic;
     }
 };
 
 class Strategy {
 public:
-    virtual NumArr execute(Matrix graph, int start, int end) const = 0;
     virtual ~Strategy() = default;
+    virtual NumArr execute(Matrix graph, int start, int end) const = 0;
 };
 
 class AStarStrategy:public Strategy {
