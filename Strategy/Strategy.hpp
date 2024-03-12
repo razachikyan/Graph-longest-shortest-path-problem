@@ -5,14 +5,19 @@
 using NumArr = std::vector<int>;
 using Matrix = std::vector<NumArr>;
 
-struct NodeStr {
+struct NodeAstar {
     int cost;
-    int vertex;
+    int name;
     int heuristic;
 
-    bool operator>(const NodeStr& other) const {
+    bool operator>(const NodeAstar& other) const {
         return cost + heuristic > other.cost + other.heuristic;
     }
+};
+
+struct NodeDijkstra {
+    int name;
+    int cost;
 };
 
 class Strategy {
@@ -21,12 +26,13 @@ public:
     virtual NumArr execute(Matrix graph, int start, int end) const = 0;
 };
 
-class AStarStrategy:public Strategy {
-public:
-    NumArr execute(Matrix graph, int start, int end) const override;
-};
-
-class DijkstraStrategy:public Strategy {
+class DijkstraStrategy :public Strategy {
 public:
     NumArr execute(Matrix graph, int start, int end)  const override;
+};
+
+
+class AStarStrategy :public Strategy {
+public:
+    NumArr execute(Matrix graph, int start, int end) const override;
 };

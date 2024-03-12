@@ -23,14 +23,14 @@ void Graph::getNeighborMatrix() {
 
 void Graph::printGraph() {
     std::cout << std::left << std::setfill(' ') << std::setw(4);
-    for (int i = 0; i < graph.size(); ++i) std::cout << i << std::left << std::setfill(' ') << std::setw(3);
+    for (int i = 0; i < graph.size(); ++i) std::cout << "*" << std::left << std::setfill(' ') << std::setw(4);
     std::cout << std::endl;
     std::cout << std::endl;
 
     for (int i = 0; i < graph.size(); ++i) {
-        std::cout << i << std::left << std::setfill(' ') << std::setw(4);
-        for (int j = 0; j < graph.size(); ++j) std::cout << graph[i][j] << std::left << std::setfill(' ') << std::setw(3);
-        std::cout << std::endl;
+        std::cout << "*" << std::left << std::setfill(' ') << std::setw(4);
+        for (int j = 0; j < graph.size(); ++j) std::cout << graph[i][j] << std::left << std::setfill(' ') << std::setw(4);
+        std::cout << std::endl << std::endl;
     }
 }
 
