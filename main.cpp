@@ -9,9 +9,10 @@ int main() {
     std::cout << "Shortest path >>>> " << pathDijkstra.size() << std::endl;
     graph.printPath(pathDijkstra);
 
-    // graph.setStrategy("astar");
-    // NumArr pathAStar = graph.getShortestPath();
-    // graph.printPath(pathAStar);
+    graph.setStrategy("astar");
+    NumArr pathAStar = graph.getShortestPath();
+    std::cout << "Shortest path >>>> " << pathAStar.size() << std::endl;
+    graph.printPath(pathAStar);
 
     return 0;
 }

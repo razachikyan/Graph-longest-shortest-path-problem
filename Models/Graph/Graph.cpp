@@ -50,7 +50,7 @@ void Graph::inputGraph() {
 }
 
 void Graph::setNodes() {
-    for(int i = 0; i < nodeCount; ++i) {
+    for (int i = 0; i < nodeCount; ++i) {
         std::string name;
         std::cout << "Enter the node name:: "; std::cin >> name;
         Node node = Node(i, name);
@@ -92,13 +92,13 @@ void Graph::readGraphFromFile(const std::string& path) {
         int first = findNodeByName(node1);
         int second = findNodeByName(node2);
 
-        if(first == -1) {
+        if (first == -1) {
             Node node = Node(nodes.size(), node1);
             nodes.push_back(node);
             first = node.getIndex();
         }
 
-        if(second == -1) {
+        if (second == -1) {
             Node node = Node(nodes.size(), node2);
             nodes.push_back(node);
             second = node.getIndex();
@@ -215,7 +215,7 @@ void Graph::mutation() {
     const double mutationRate = 0.1;
     auto getRandomPosition = [&]() -> size_t {
         return rand() % population.front().size();
-    };
+        };
 
     for (auto& chromosome : population) {
         if ((static_cast<double>(rand()) / RAND_MAX) < mutationRate) {
@@ -235,9 +235,9 @@ void Graph::replacePopulation() {
     const size_t elitismCount = 2;
     Population combinedPopulation = population;
     std::sort(combinedPopulation.begin(), combinedPopulation.end(),
-    [this](const NumArr& a, const NumArr& b) {
-        return calculateFitness(a) > calculateFitness(b);
-    });
+        [this](const NumArr& a, const NumArr& b) {
+            return calculateFitness(a) > calculateFitness(b);
+        });
 
     population.assign(combinedPopulation.begin(), combinedPopulation.begin() + elitismCount);
     population.resize(combinedPopulation.size() - elitismCount);
@@ -265,24 +265,24 @@ NumArr Graph::genetic() {
 }
 
 void Graph::setStrategy(std::string strategyType) {
-    if(strategyType == "dijkstra") this->strategy = std::make_unique<DijkstraStrategy>();
-    else if(strategyType == "astar") this->strategy = std::make_unique<AStarStrategy>();
+    if (strategyType == "dijkstra") this->strategy = std::make_unique<DijkstraStrategy>();
+    else if (strategyType == "astar") this->strategy = std::make_unique<AStarStrategy>();
     else throw std::runtime_error("Incorrect strategy type");
 }
 
 NumArr Graph::getShortestPath() {
-    if(!this->strategy) throw std::runtime_error("Choose strategy for getting shortest path");
+    if (!this->strategy) throw std::runtime_error("Choose strategy for getting shortest path");
     std::string start, target;
     std::cout << "enter start and target nodes [a b]:: "; std::cin >> start >> target;
     int node1 = findNodeByName(start);
     int node2 = findNodeByName(target);
-    if(node1 != -1 && node2 != -1) return strategy->execute(graph, node1, node2);
+    if (node1 != -1 && node2 != -1) return strategy->execute(graph, node1, node2);
     return {};
 }
 
 int Graph::findNodeByName(std::string name) {
-    for(int i = 0; i < nodes.size(); ++i) {
-        if(nodes[i].getName() == name) return i;
+    for (int i = 0; i < nodes.size(); ++i) {
+        if (nodes[i].getName() == name) return i;
     }
     return -1;
 }
