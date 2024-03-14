@@ -6,8 +6,8 @@ using NumArr = std::vector<int>;
 using Matrix = std::vector<NumArr>;
 
 struct NodeAstar {
-    int cost;
     int name;
+    int cost;
     int heuristic;
 
     bool operator>(const NodeAstar& other) const {
@@ -18,6 +18,10 @@ struct NodeAstar {
 struct NodeDijkstra {
     int name;
     int cost;
+
+    bool operator>(const NodeDijkstra& other) const {
+        return cost > other.cost;
+    }
 };
 
 class Strategy {
