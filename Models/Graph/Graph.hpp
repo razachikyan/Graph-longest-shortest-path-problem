@@ -7,18 +7,25 @@ using Nodes = std::vector<Node>;
 using Population = std::vector<NumArr>;
 using Weights = std::map<std::pair<int, int>, int>;
 
+struct Individual {
+    NumArr path;
+    double fitness;
+
+    Individual(const NumArr& p) : path(p), fitness(0.0) {}
+};
+
 class Graph {
 public:
-    Graph(): strategy(nullptr) {}
-    NumArr genetic();
+    Graph() : strategy(nullptr) {}
+    void setNodes();
     void inputGraph();
     void printGraph();
-    void setNodes();
     void getGraphWeights();
     void writeGraphToFile();
     void getNeighborMatrix();
     NumArr getShortestPath();
     void printPath(NumArr& path);
+    NumArr GAIP(int generations);
     void setStrategy(std::string strategyType);
     void readGraphFromFile(const std::string& path);
 private:
@@ -28,15 +35,11 @@ private:
     std::unique_ptr<Strategy> strategy;
 
 private:
-    void evolve();
-    void mutation();
-    void selection();
-    void crossover();
-    void replacePopulation();
-    NumArr getBestChromosome();
-    Population initializePopulation();
-    double calculateFitness(const NumArr& chromosome);
     int findNodeByName(std::string);
+    Individual generateRandomIndividual();
+    double evaluateFitness(const Individual& ind);
+    double calculateFitness(const NumArr& chromosome);
+    bool compareIndividuals(const Individual& a, const Individual& b);
 private:
     int edgeCount;
     int nodeCount;
