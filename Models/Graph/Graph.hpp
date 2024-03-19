@@ -18,7 +18,6 @@ class Graph {
 public:
     Graph() : strategy(nullptr) {}
     void setNodes();
-    NumArr genetic();
     void inputGraph();
     void printGraph();
     void getGraphWeights();
@@ -36,14 +35,7 @@ private:
     std::unique_ptr<Strategy> strategy;
 
 private:
-    void evolve();
-    void mutation();
-    void selection();
-    void crossover();
-    void replacePopulation();
-    NumArr getBestChromosome();
     int findNodeByName(std::string);
-    Population initializePopulation();
     Individual generateRandomIndividual();
     double evaluateFitness(const Individual& ind);
     double calculateFitness(const NumArr& chromosome);

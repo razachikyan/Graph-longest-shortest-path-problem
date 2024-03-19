@@ -115,21 +115,6 @@ void Graph::readGraphFromFile(const std::string& path) {
     getNeighborMatrix();
 };
 
-Population Graph::initializePopulation() {
-    population.clear();
-    const int populationSize = 50;
-
-    for (int i = 0; i < populationSize; ++i) {
-        NumArr chromosome;
-        for (int vertex = 0; vertex < graph.size(); ++vertex) {
-            std::cout << graph.size() << "/" << vertex << std::endl;
-            chromosome.push_back(vertex);
-        }
-        std::shuffle(chromosome.begin(), chromosome.end(), std::default_random_engine(std::random_device()()));
-        population.push_back(chromosome);
-    }
-}
-
 double Graph::calculateFitness(const NumArr& chromosome) {
     const int maxPathLength = std::numeric_limits<int>::max();
     int pathLength = 0;
@@ -150,112 +135,6 @@ double Graph::calculateFitness(const NumArr& chromosome) {
         }
     }
     return (pathLength == 0) ? std::numeric_limits<double>::infinity() : 1.0 / static_cast<double>(pathLength + 1);
-}
-
-void Graph::selection() {
-    const int populationSize = 50;
-    double totalFitness = 0.0;
-    std::vector<double> fitnessValues;
-    fitnessValues.reserve(population.size());
-
-    for (const auto& chromosome : population) {
-        double fitness = calculateFitness(chromosome);
-        totalFitness += fitness;
-        fitnessValues.push_back(fitness);
-    }
-
-    std::vector<double> cumulativeProbabilities;
-    cumulativeProbabilities.reserve(population.size());
-    double cumulativeProbability = 0.0;
-
-    for (double fitness : fitnessValues) {
-        double probability = fitness / totalFitness;
-        cumulativeProbability += probability;
-        cumulativeProbabilities.push_back(cumulativeProbability);
-    }
-
-    Population selectedChromosomes;
-
-    for (int i = 0; i < populationSize; ++i) {
-        double randomValue = static_cast<double>(rand()) / RAND_MAX;
-        auto selectedIt = std::upper_bound(cumulativeProbabilities.begin(), cumulativeProbabilities.end(), randomValue);
-        int selectedIndex = static_cast<int>(std::distance(cumulativeProbabilities.begin(), selectedIt));
-        selectedChromosomes.push_back(population[selectedIndex]);
-    }
-
-    population = selectedChromosomes;
-}
-
-
-void Graph::crossover() {
-    Population newPopulation;
-    const size_t crossoverPointRange = 1;
-
-    for (size_t i = 0; i < population.size(); i += 2) {
-        if (i + 1 < population.size()) {
-            const NumArr& parent1 = population[i];
-            const NumArr& parent2 = population[i + 1];
-            size_t crossoverPoint = rand() % (parent1.size() - crossoverPointRange) + crossoverPointRange;
-            NumArr offspring1(parent1.begin(), parent1.begin() + crossoverPoint);
-            offspring1.insert(offspring1.end(), parent2.begin() + crossoverPoint, parent2.end());
-            NumArr offspring2(parent2.begin(), parent2.begin() + crossoverPoint);
-            offspring2.insert(offspring2.end(), parent1.begin() + crossoverPoint, parent1.end());
-            newPopulation.push_back(offspring1);
-            newPopulation.push_back(offspring2);
-        }
-
-        else newPopulation.push_back(population[i]);
-    }
-
-    population = newPopulation;
-}
-
-
-void Graph::mutation() {
-    const double mutationRate = 0.1;
-    auto getRandomPosition = [&]() -> size_t {
-        return rand() % population.front().size();
-        };
-
-    for (auto& chromosome : population) {
-        if ((static_cast<double>(rand()) / RAND_MAX) < mutationRate) {
-            size_t position1 = getRandomPosition();
-            size_t position2;
-            do {
-                position2 = getRandomPosition();
-            } while (position1 == position2);
-
-            std::swap(chromosome[position1], chromosome[position2]);
-        }
-    }
-}
-
-
-void Graph::replacePopulation() {
-    const size_t elitismCount = 2;
-    Population combinedPopulation = population;
-    std::sort(combinedPopulation.begin(), combinedPopulation.end(),
-        [this](const NumArr& a, const NumArr& b) {
-            return calculateFitness(a) > calculateFitness(b);
-        });
-
-    population.assign(combinedPopulation.begin(), combinedPopulation.begin() + elitismCount);
-    population.resize(combinedPopulation.size() - elitismCount);
-}
-
-
-void Graph::evolve() {
-    const int numGenerations = 100;
-    for (int generation = 0; generation < numGenerations; ++generation) {
-        selection();
-        crossover();
-        mutation();
-        replacePopulation();
-    }
-}
-
-NumArr Graph::getBestChromosome() {
-    return population[0];
 }
 
 Individual Graph::generateRandomIndividual() {
@@ -299,12 +178,6 @@ NumArr Graph::GAIP(int generations) {
     }
 
     return bestIndividual.path;
-}
-
-NumArr Graph::genetic() {
-    initializePopulation();
-    evolve();
-    return getBestChromosome();
 }
 
 void Graph::setStrategy(std::string strategyType) {
