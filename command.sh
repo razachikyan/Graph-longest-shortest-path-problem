@@ -1,0 +1,1 @@
+g++ ./main.cpp ./Models/Graph/Graph.cpp ./Strategy/Strategy.cpp ./Models/Node/Node.cpp && ./a.exe

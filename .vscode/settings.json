@@ -55,6 +55,9 @@
     "string": "cpp",
     "sstream": "cpp",
     "random": "cpp",
-    "fstream": "cpp"
+    "fstream": "cpp",
+    "iomanip": "cpp",
+    "xlocmon": "cpp",
+    "xloctime": "cpp"
   }
 }

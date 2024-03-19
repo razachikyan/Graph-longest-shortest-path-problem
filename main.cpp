@@ -1,16 +1,17 @@
-#include "./Graph/Graph.hpp"
+#include "./Models/Graph/Graph.hpp"
 
 int main() {
     Graph graph;
     graph.readGraphFromFile("graph.txt");
-
-    std::cout << "\tShortest path with dijkstra\n";
-
-    NumArr pathDijkstra = graph.dijkstra();
+    graph.printGraph();
+    graph.setStrategy("dijkstra");
+    NumArr pathDijkstra = graph.getShortestPath(); std::cout << std::endl;
     graph.printPath(pathDijkstra);
+    std::cout << pathDijkstra.size() << std::endl;
 
-    std::cout << "\tShortest path with A*\n";
-    NumArr pathAStar = graph.astar();
+    graph.setStrategy("astar");
+    NumArr pathAStar = graph.getShortestPath();
+    std::cout << "Shortest path >>>> " << pathAStar.size() << std::endl;
     graph.printPath(pathAStar);
 
     return 0;

@@ -2,56 +2,78 @@
 
 void Graph::getGraphWeights() {
     for (int i = 0; i < edgeCount; ++i) {
-        std::pair<int, int> neighborNodes = { 0, 0 };
+        std::string first;
+        std::string second;
         int weight;
-        std::cout << "Input node_1, node_2 and weight: "; std::cin >> neighborNodes.first >> neighborNodes.second >> weight;
-        graphWeights[neighborNodes] = weight;
+        std::cout << "Input node_1, node_2 and weight: "; std::cin >> first >> second >> weight;
+        int node1 = findNodeByName(first);
+        int node2 = findNodeByName(second);
+        graphWeights[{node1, node2}] = weight;
     }
 };
 
 void Graph::getNeighborMatrix() {
-    graph = std::vector< std::vector< int > >(nodeCount, std::vector< int >(nodeCount, 0)); // defone from map
-    for (auto& pair : graphWeights)
-    {
+    graph = std::vector< std::vector<int>>(nodeCount, std::vector<int>(nodeCount, 0));
+    for (auto& pair : graphWeights) {
         int node1 = pair.first.first, node2 = pair.first.second, weight = pair.second;
         graph[node1][node2] = weight;
         graph[node2][node1] = weight;
     }
 };
 
-void Graph::printGraph()
-{
-    std::cout << "  ";
-    for (int i = 0; i < graph.size(); ++i)
-    {
-        std::cout << i << " ";
-    }
+void Graph::printGraph() {
+    std::cout << std::left << std::setfill(' ') << std::setw(4);
+    for (int i = 0; i < graph.size(); ++i) std::cout << "*" << std::left << std::setfill(' ') << std::setw(4);
+    std::cout << std::endl;
     std::cout << std::endl;
 
-    for (int i = 0; i < graph.size(); ++i)
-    {
-        std::cout << i << " ";
-        for (int j = 0; j < graph.size(); ++j)
-        {
-            std::cout << graph[i][j] << " ";
-        }
-        std::cout << std::endl;
+    for (int i = 0; i < graph.size(); ++i) {
+        std::cout << "*" << std::left << std::setfill(' ') << std::setw(4);
+        for (int j = 0; j < graph.size(); ++j) std::cout << graph[i][j] << std::left << std::setfill(' ') << std::setw(4);
+        std::cout << std::endl << std::endl;
     }
 }
 
 void Graph::printPath(NumArr& path) {
     for (int i = 0; i < path.size(); ++i) {
-        std::cout << path[i] << " ";
+        std::cout << nodes[path[i]].getName() << " ";
     }
     std::cout << std::endl;
 }
 
-void Graph::inputGraph()
-{
+void Graph::inputGraph() {
     std::cout << "Input Node and Edge count: "; std::cin >> nodeCount >> edgeCount;
 
+    setNodes();
     getGraphWeights();
     getNeighborMatrix();
+}
+
+void Graph::setNodes() {
+    for (int i = 0; i < nodeCount; ++i) {
+        std::string name;
+        std::cout << "Enter the node name:: "; std::cin >> name;
+        Node node = Node(i, name);
+        nodes.push_back(node);
+    }
+}
+
+void Graph::writeGraphToFile() {
+    const std::string outputFileName = "graphOutput.txt";
+    std::ofstream outputFile(outputFileName);
+    if (!outputFile.is_open()) {
+        std::cerr << "Error: Unable to open file for writing." << std::endl;
+        return;
+    }
+
+    for (const auto& entry : graphWeights) {
+        std::string node1 = nodes[entry.first.first].getName();
+        std::string node2 = nodes[entry.first.second].getName();
+        outputFile << node1 << ' ' << node1 << ' ' << entry.second << '\n';
+    }
+
+    outputFile.close();
+    std::cout << "Data has been written to " << outputFileName << std::endl;
 }
 
 void Graph::readGraphFromFile(const std::string& path) {
@@ -61,115 +83,37 @@ void Graph::readGraphFromFile(const std::string& path) {
         return;
     }
 
-    int node1, node2, weight;
+    std::string node1, node2;
+    int weight;
+    int id = 0;
+    std::vector<std::string> nodeVec;
+
     while (inputFile >> node1 >> node2 >> weight) {
-        graphWeights[std::make_pair(node1, node2)] = weight;
+        int first = findNodeByName(node1);
+        int second = findNodeByName(node2);
+
+        if (first == -1) {
+            Node node = Node(nodes.size(), node1);
+            nodes.push_back(node);
+            first = node.getIndex();
+        }
+
+        if (second == -1) {
+            Node node = Node(nodes.size(), node2);
+            nodes.push_back(node);
+            second = node.getIndex();
+        }
+
+        graphWeights[{first, second}] = weight;
     }
 
     inputFile.close();
 
-    nodeCount = 0;
-    for (const auto& pair : graphWeights) {
-        nodeCount = std::max(nodeCount, std::max(pair.first.first, pair.first.second));
-    }
-    nodeCount++;
-
+    nodeCount = nodes.size();
     edgeCount = graphWeights.size();
 
     getNeighborMatrix();
-    printGraph();
 };
-
-NumArr Graph::astar() {
-    int start, target;
-    std::cout << "enter start and target nodes"; std::cin >> start >> target;
-    int n = graph.size();
-    NumArr parent(n, -1);
-    NumArr cost(n, INT_MAX);
-    NumArr heuristic(n, 0);
-
-    std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq;
-
-    pq.push({ start, 0, 0 });
-    cost[start] = 0;
-
-    while (!pq.empty()) {
-        Node current = pq.top();
-        pq.pop();
-
-        if (current.vertex == target) {
-            NumArr path;
-            int node = target;
-
-            while (node != -1) {
-                path.push_back(node);
-                node = parent[node];
-            }
-
-            reverse(path.begin(), path.end());
-            return path;
-        }
-
-        for (int neighbor = 0; neighbor < n; ++neighbor) {
-            if (graph[current.vertex][neighbor] != 0) {
-                int newCost = current.cost + graph[current.vertex][neighbor];
-
-                if (newCost < cost[neighbor]) {
-                    cost[neighbor] = newCost;
-                    parent[neighbor] = current.vertex;
-                    pq.push({ neighbor, newCost, heuristic[neighbor] });
-                }
-            }
-        }
-    }
-
-    return NumArr();
-}
-
-NumArr Graph::dijkstra() {
-    int start, target;
-    std::cout << "enter start and target nodes"; std::cin >> start >> target;
-    int n = graph.size();
-    NumArr parent(n, -1);
-    NumArr distance(n, INF);
-
-    std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq;
-
-    pq.push({ start, 0 });
-    distance[start] = 0;
-
-    while (!pq.empty()) {
-        Node current = pq.top();
-        pq.pop();
-
-        if (current.vertex == target) {
-            NumArr path;
-            int node = target;
-
-            while (node != -1) {
-                path.push_back(node);
-                node = parent[node];
-            }
-
-            std::reverse(path.begin(), path.end());
-            return path;
-        }
-
-        for (int neighbor = 0; neighbor < n; ++neighbor) {
-            if (graph[current.vertex][neighbor] != 0) {
-                int newDistance = current.cost + graph[current.vertex][neighbor];
-
-                if (newDistance < distance[neighbor]) {
-                    distance[neighbor] = newDistance;
-                    parent[neighbor] = current.vertex;
-                    pq.push({ neighbor, newDistance });
-                }
-            }
-        }
-    }
-
-    return NumArr();
-}
 
 Population Graph::initializePopulation() {
     population.clear();
@@ -185,7 +129,6 @@ Population Graph::initializePopulation() {
         population.push_back(chromosome);
     }
 }
-
 
 double Graph::calculateFitness(const NumArr& chromosome) {
     const int maxPathLength = std::numeric_limits<int>::max();
@@ -214,6 +157,7 @@ void Graph::selection() {
     double totalFitness = 0.0;
     std::vector<double> fitnessValues;
     fitnessValues.reserve(population.size());
+
     for (const auto& chromosome : population) {
         double fitness = calculateFitness(chromosome);
         totalFitness += fitness;
@@ -223,11 +167,13 @@ void Graph::selection() {
     std::vector<double> cumulativeProbabilities;
     cumulativeProbabilities.reserve(population.size());
     double cumulativeProbability = 0.0;
+
     for (double fitness : fitnessValues) {
         double probability = fitness / totalFitness;
         cumulativeProbability += probability;
         cumulativeProbabilities.push_back(cumulativeProbability);
     }
+
     Population selectedChromosomes;
 
     for (int i = 0; i < populationSize; ++i) {
@@ -257,9 +203,8 @@ void Graph::crossover() {
             newPopulation.push_back(offspring1);
             newPopulation.push_back(offspring2);
         }
-        else {
-            newPopulation.push_back(population[i]);
-        }
+
+        else newPopulation.push_back(population[i]);
     }
 
     population = newPopulation;
@@ -316,6 +261,28 @@ NumArr Graph::getBestChromosome() {
 NumArr Graph::genetic() {
     initializePopulation();
     evolve();
-
     return getBestChromosome();
+}
+
+void Graph::setStrategy(std::string strategyType) {
+    if (strategyType == "dijkstra") this->strategy = std::make_unique<DijkstraStrategy>();
+    else if (strategyType == "astar") this->strategy = std::make_unique<AStarStrategy>();
+    else throw std::runtime_error("Incorrect strategy type");
+}
+
+NumArr Graph::getShortestPath() {
+    if (!this->strategy) throw std::runtime_error("Choose strategy for getting shortest path");
+    std::string start, target;
+    std::cout << "enter start and target nodes [a b]:: "; std::cin >> start >> target;
+    int node1 = findNodeByName(start);
+    int node2 = findNodeByName(target);
+    if (node1 != -1 && node2 != -1) return strategy->execute(graph, node1, node2);
+    return {};
+}
+
+int Graph::findNodeByName(std::string name) {
+    for (int i = 0; i < nodes.size(); ++i) {
+        if (nodes[i].getName() == name) return i;
+    }
+    return -1;
 }
