@@ -13,7 +13,7 @@ void Graph::getGraphWeights() {
 };
 
 void Graph::getNeighborMatrix() {
-    graph = std::vector< std::vector<int>>(nodeCount, std::vector<int>(nodeCount, 0));
+    graph = Matrix(nodeCount, NumArr(nodeCount, 0));
     for (auto& pair : graphWeights) {
         int node1 = pair.first.first, node2 = pair.first.second, weight = pair.second;
         graph[node1][node2] = weight;
@@ -256,6 +256,49 @@ void Graph::evolve() {
 
 NumArr Graph::getBestChromosome() {
     return population[0];
+}
+
+Individual Graph::generateRandomIndividual() {
+    NumArr path(nodeCount);
+    for (int i = 0; i < nodeCount; ++i)
+        path[i] = i;
+
+    std::shuffle(path.begin(), path.end(), std::mt19937(std::random_device()()));
+
+    return Individual(path);
+}
+
+double Graph::evaluateFitness(const Individual& ind) {
+    double length = 0.0;
+    for (int i = 1; i < nodeCount; ++i)
+        length += graph[ind.path[i - 1]][ind.path[i]];
+
+    return length;
+}
+
+bool Graph::compareIndividuals(const Individual& a, const Individual& b) {
+    return a.fitness < b.fitness;
+}
+
+NumArr Graph::GAIP(int generations) {
+    std::vector<Individual> population;
+    for (int i = 0; i < 100; ++i)
+        population.push_back(generateRandomIndividual());
+
+    Individual bestIndividual = population[0];
+    for (int gen = 0; gen < generations; ++gen) {
+        for (auto& ind : population) {
+            ind.fitness = evaluateFitness(ind);
+        }
+
+        std::sort(population.begin(), population.end(), compareIndividuals);
+
+        if (population[0].fitness < bestIndividual.fitness) {
+            bestIndividual = population[0];
+        }
+    }
+
+    return bestIndividual.path;
 }
 
 NumArr Graph::genetic() {
