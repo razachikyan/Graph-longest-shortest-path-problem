@@ -39,7 +39,6 @@ private:
     Individual generateRandomIndividual();
     double evaluateFitness(const Individual& ind);
     double calculateFitness(const NumArr& chromosome);
-    bool compareIndividuals(const Individual& a, const Individual& b);
 private:
     int edgeCount;
     int nodeCount;

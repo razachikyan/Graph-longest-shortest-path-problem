@@ -155,14 +155,11 @@ double Graph::evaluateFitness(const Individual& ind) {
     return length;
 }
 
-bool Graph::compareIndividuals(const Individual& a, const Individual& b) {
-    return a.fitness < b.fitness;
-}
-
 NumArr Graph::GAIP(int generations) {
     std::vector<Individual> population;
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < 100; ++i) {
         population.push_back(generateRandomIndividual());
+    }
 
     Individual bestIndividual = population[0];
     for (int gen = 0; gen < generations; ++gen) {
@@ -170,7 +167,9 @@ NumArr Graph::GAIP(int generations) {
             ind.fitness = evaluateFitness(ind);
         }
 
-        std::sort(population.begin(), population.end(), compareIndividuals);
+        std::sort(population.begin(), population.end(), [](const Individual& a, const Individual& b){
+            return a.fitness < b.fitness;
+        });
 
         if (population[0].fitness < bestIndividual.fitness) {
             bestIndividual = population[0];
