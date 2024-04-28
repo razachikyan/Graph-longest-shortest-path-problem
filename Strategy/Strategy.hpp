@@ -40,3 +40,8 @@ class AStarStrategy :public Strategy {
 public:
     NumArr execute(Matrix graph, int start, int end) const override;
 };
+
+class BruteForceStrategy :public Strategy {
+public:
+    NumArr execute(Matrix graph, int start, int end) const override;
+};

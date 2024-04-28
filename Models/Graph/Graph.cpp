@@ -180,19 +180,14 @@ NumArr Graph::GAIP(int generations) {
 }
 
 void Graph::setStrategy(std::string strategyType) {
-    if (strategyType == "dijkstra") this->strategy = std::make_unique<DijkstraStrategy>();
-    else if (strategyType == "astar") this->strategy = std::make_unique<AStarStrategy>();
-    else throw std::runtime_error("Incorrect strategy type");
+    if (strategyType == "Dijkstra") this->strategy = std::make_unique<DijkstraStrategy>();
+    else if(strategyType == "AStar") this->strategy = std::make_unique<AStarStrategy>();
+    else this->strategy = std::make_unique<BruteForceStrategy>();
 }
 
-NumArr Graph::getShortestPath() {
+NumArr Graph::getShortestPath(int start, int end) {
     if (!this->strategy) throw std::runtime_error("Choose strategy for getting shortest path");
-    std::string start, target;
-    std::cout << "enter start and target nodes [a b]:: "; std::cin >> start >> target;
-    int node1 = findNodeByName(start);
-    int node2 = findNodeByName(target);
-    if (node1 != -1 && node2 != -1) return strategy->execute(graph, node1, node2);
-    return {};
+    return strategy->execute(graph, start, end);
 }
 
 int Graph::findNodeByName(std::string name) {
@@ -200,4 +195,9 @@ int Graph::findNodeByName(std::string name) {
         if (nodes[i].getName() == name) return i;
     }
     return -1;
+}
+
+Matrix Graph::getMatrix() const
+{
+    return graph;
 }

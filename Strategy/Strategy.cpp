@@ -85,3 +85,33 @@ NumArr DijkstraStrategy::execute(Matrix adjacencyMatrix, int source, int target)
 
     return NumArr();
 }
+
+void bruteForce(Matrix& adjMatrix, int current, int end, NumArr& currentPath, int pathLength, int& maxPathLength, NumArr& maxPath) {
+    if (current == end) {
+        if (pathLength > maxPathLength) {
+            maxPathLength = pathLength;
+            maxPath = currentPath;
+        }
+        return;
+    }
+
+    for (int i = 0; i < adjMatrix.size(); i++) {
+        if (adjMatrix[current][i] != 0 && find(currentPath.begin(), currentPath.end(), i) == currentPath.end()) {
+            currentPath.push_back(i);
+            bruteForce(adjMatrix, i, end, currentPath, pathLength + adjMatrix[current][i], maxPathLength, maxPath);
+            currentPath.pop_back();
+        }
+    }
+}
+
+NumArr BruteForceStrategy::execute(Matrix adjMatrix, int start, int end) const {
+    int maxPathLength = INT_MIN;
+    NumArr maxPath;
+
+    NumArr currentPath;
+    currentPath.push_back(start);
+
+    bruteForce(adjMatrix, start, end, currentPath, 0, maxPathLength, maxPath);
+
+    return maxPath;
+}

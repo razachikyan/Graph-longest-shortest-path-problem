@@ -18,12 +18,13 @@ class Graph {
 public:
     Graph() : strategy(nullptr) {}
     void setNodes();
+    Matrix getMatrix() const;
     void inputGraph();
     void printGraph();
     void getGraphWeights();
     void writeGraphToFile();
     void getNeighborMatrix();
-    NumArr getShortestPath();
+    NumArr getShortestPath(int, int);
     void printPath(NumArr& path);
     NumArr GAIP(int generations);
     void setStrategy(std::string strategyType);

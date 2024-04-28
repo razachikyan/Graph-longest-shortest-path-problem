@@ -1,15 +1,13 @@
 #include "./Models/Graph/Graph.hpp"
+#include "./Views/MainWindow/MainWindow.hpp"
 
-int main() {
-    Graph graph;
-    graph.readGraphFromFile("graph.txt");
-    // graph.printGraph();
-    NumArr path = graph.GAIP(10);
-    // graph.printPath(path);
-    std::cout << std::endl;
-    for(auto i : path) {
-        std::cout << path[i] << ", ";
-    }
-    std::cout << std::endl;
-    return 0;
+#include <QApplication>
+
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+
+    MainWindow window;
+    window.show();
+
+    return app.exec();
 }
